@@ -2337,10 +2337,10 @@ load balancer configuration will be use in each website
                   proxy_pass http://codeigniter;
           }
   
-  #       location /blog {
-  #               rewrite /?(.*)$ /$1 break;
-  #               proxy_pass http://lxc_wordpress.dev;
-  #       }
+          location /blog {
+                 rewrite /?(.*)$ /$1 break;
+                 proxy_pass http://lxc_wordpress.dev;
+          }
   
           location /phpmyadmin{
                   rewrite /phpmyadmin/?(.*)$ /$1 break;
@@ -2389,7 +2389,7 @@ load balancer configuration will be use in each website
 
   - codeigniter (kelompok12.fpsas/app)
 
-    ![Tanpilan App](D:\Dokumentasi\Assets\TanpilanApp.png)
+    ![Tanpilan App](/Assets/TanpilanApp.png)
 
   - yii (kelompok12.fpsas/product)
 
