@@ -79,11 +79,11 @@ load balancer configuration will be use in each website
 
 - Then, we need to do some configuration to settings static ip and install ssh server in each lxc. In this case we doing some configuration ip like the picture as below.
 
-  [foto sudo lxc-ls -f]
+  ![ls](/Assets/ls.png)
 
 - Register the domain of the each lxc in the `sudo nano /etc/hosts` like the picture below.
 
-  [foto sudo nano /etc/hosts]
+  ![etc](/Assets/etc.png)
 
 - Now, we need to write some ansible script to do frame installation in each lxc just like the requirements in the case study.
 
@@ -1109,7 +1109,7 @@ load balancer configuration will be use in each website
       [mariadb]
       ```
 
-    - Then, we need to create a folder named pma to accommodate pma installation in the pma roles. In this roles, we just need to create 2 directory named handlers and tasks.
+    - Then, we need to create a folder named pma to accommodate pma installation in the pma roles. In this roles, we just need to create 3 directory named tasks, handlers and templates.
 
       - In the tasks directory, create some file named main.yml. Then type the script as below.
 
@@ -1152,14 +1152,14 @@ load balancer configuration will be use in each website
         - name: add repository php
           shell: echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list
         
-        #- name: wget repository
-        #  shell: wget https://files.phpmyadmin.net/phpMyAdmin/5.1.1/phpMyAdmin-5.1.1-all-languages.tar.gz
+        - name: wget repository
+          shell: wget https://files.phpmyadmin.net/phpMyAdmin/5.1.1/phpMyAdmin-5.1.1-all-languages.tar.gz
         
-        #- name: tar phpmyadmin
-        #  shell: tar -zxvf phpMyAdmin-5.1.1-all-languages.tar.gz
+        - name: tar phpmyadmin
+          shell: tar -zxvf phpMyAdmin-5.1.1-all-languages.tar.gz
         
-        #- name: move phpmyadmin
-        #  shell: mv phpMyAdmin-5.1.1-all-languages /usr/share/phpMyAdmin
+        - name: move phpmyadmin
+          shell: mv phpMyAdmin-5.1.1-all-languages /usr/share/phpMyAdmin
         
         - name: apt update
           shell: apt update
@@ -1229,7 +1229,7 @@ load balancer configuration will be use in each website
           action: service name=php7.2-fpm state=restarted
         ```
 
-      - In the templates directory, create some file named pma.local  . Then type the script as below.
+      - In the templates directory, create some file named pma.local . Then type the script as below.
 
         ```
         server {
@@ -2000,7 +2000,7 @@ load balancer configuration will be use in each website
         action: service name=nginx state=restarted
       ```
 
-    -  In the templates directory, create some file named yii.conf  . Then type the script as below.
+    -  In the templates directory, create some file named yii.conf. Then type the script as below.
 
       ```
       server {
@@ -2054,17 +2054,352 @@ load balancer configuration will be use in each website
       }
       ```
 
-      
+- After that, we need to create some file to running the configuration that was we made in the roles directory.
 
-![Tampilan Laravel](/Assets/TampilanLaravel.png)
+  - Create file named hosts `nano hosts` and type script as below.
 
-![Tampilan News](/Assets/TampilanNews.png)
+    ```
+    [laravel]
+    laravel ansible_host=lxc_laravel.dev ansible_ssh_user=root ansible_become_pass=akbar
+    lxc_php7_1L ansible_host=lxc_php7_1L.dev ansible_ssh_user=root ansible_become_pass=akbar
+    lxc_php7_2L ansible_host=lxc_php7_2L.dev ansible_ssh_user=root ansible_become_pass=akbar
+    lxc_php7_4L ansible_host=lxc_php7_4L.dev ansible_ssh_user=root ansible_become_pass=akbar
+    lxc_php7_6L ansible_host=lxc_php7_6L.dev ansible_ssh_user=root ansible_become_pass=akbar
+    
+    [codeigniter]
+    codeigniter ansible_host=lxc_codeigniter.dev ansible_ssh_user=root ansible_become_pass=akbar
+    lxc_php5_1 ansible_host=lxc_php5_1.dev ansible_ssh_user=root ansible_become_pass=akbar
+    lxc_php5_2 ansible_host=lxc_php5_2.dev ansible_ssh_user=root ansible_become_pass=akbar
+    
+    [wordpress]
+    wordpress ansible_host=lxc_wordpress.dev ansible_ssh_user=root ansible_become_pass=akbar
+    lxc_php7_2W ansible_host=lxc_php7_2W.dev ansible_ssh_user=root ansible_become_pass=akbar
+    lxc_php7_3W ansible_host=lxc_php7_3W.dev ansible_ssh_user=root ansible_become_pass=akbar
+    lxc_php7_4W ansible_host=lxc_php7_4W.dev ansible_ssh_user=root ansible_become_pass=akbar
+    lxc_php7_5W ansible_host=lxc_php7_5W.dev ansible_ssh_user=root ansible_become_pass=akbar
+    
+    [yii]
+    yii ansible_host=lxc_yii.dev ansible_ssh_user=root ansible_become_pass=akbar
+    lxc_php7_1Y ansible_host=lxc_php7_1Y.dev ansible_ssh_user=root ansible_become_pass=akbar
+    lxc_php7_2Y ansible_host=lxc_php7_2Y.dev ansible_ssh_user=root ansible_become_pass=akbar
+    lxc_php7_4Y ansible_host=lxc_php7_4Y.dev ansible_ssh_user=root ansible_become_pass=akbar
+    lxc_php7_5Y ansible_host=lxc_php7_5Y.dev ansible_ssh_user=root ansible_become_pass=akbar
+    lxc_php7_6Y ansible_host=lxc_php7_6Y.dev ansible_ssh_user=root ansible_become_pass=akbar
+    
+    [database]
+    lxc_mariadb ansible_host=lxc_mariadb.dev ansible_ssh_user=root ansible_become_pass=akbar
+    ```
 
-![Tampilan Yii](/Assets/TampilanYii.png)
+  - Create file named install-codeigniter.yml `nano install-codeigniter.yml` and type script as below.
 
-![Tanpilan App](D:\Dokumentasi\Assets\TanpilanApp.png)
+    ```
+    ---
+    - hosts: codeigniter
+      vars:
+        git_url: 'https://github.com/aldonesia/sas-ci'
+        destdir: '/var/www/html/ci'
+        domain: 'lxc_codeigniter.dev'
+      roles:
+        - app
+    
+    - hosts: lxc_php5_1
+      vars:
+        git_url: 'https://github.com/aldonesia/sas-ci'
+        destdir: '/var/www/html/ci'
+        domain: 'lxc_php5_1.dev'
+      roles:
+        - app
+    
+    - hosts: lxc_php5_2
+      vars:
+        git_url: 'https://github.com/aldonesia/sas-ci'
+        destdir: '/var/www/html/ci'
+        domain: 'lxc_php5_2.dev'
+      roles:
+        - app
+    ```
 
-![Tampilan PhpmyAdmin](/Assets/TampilanPhpmyAdmin.png)
+  - Create file named install-laravel.yml `nano install-laravel.yml` and type script as below.
+
+    ```
+    ---
+    - hosts: laravel
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_laravel.dev'
+      roles:
+        - php
+        - laravel
+    
+    - hosts: lxc_php7_1L
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_php7_1L.dev'
+      roles:
+        - php
+        - laravel
+    
+    - hosts: lxc_php7_2L
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_php7_2L.dev'
+      roles:
+        - php
+        - laravel
+    
+    - hosts: lxc_php7_4L
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_php7_4L.dev'
+      roles:
+        - php
+        - laravel
+    
+    - hosts: lxc_php7_6L
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_php7_6L.dev'
+      roles:
+        - php
+        - laravel
+    ```
+
+  - Create file named install-mariadb.yml `nano install-mariadb.yml` and type script as below.
+
+    ```
+    - hosts: database
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_mariadb.dev'
+      roles:
+        - db
+        - pma
+    ```
+
+  - Create file named install-wordpress.yml `nano install-wordpress.yml` and type script as below.
+
+    ```
+    ---
+    - hosts: wordpress
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_wordpress.dev'
+      roles:
+        - wordpress
+    
+    - hosts: lxc_php7_2W
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_php7_2W.dev'
+      roles:
+        - wordpress
+    
+    - hosts: lxc_php7_3W
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_php7_3W.dev'
+      roles:
+        - wordpress
+    
+    - hosts: lxc_php7_4W
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_php7_4W.dev'
+      roles:
+        - wordpress
+    
+    - hosts: lxc_php7_5W
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_php7_5W.dev'
+      roles:
+        - wordpress
+    ```
+
+  - Create file named install-yii.yml `nano install-yii.yml` and type script as below.
+
+    ```
+    ---
+    - hosts: yii
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_yii.dev'
+      roles:
+        - php
+        - yii
+    
+    - hosts: lxc_php7_1Y
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_php7_1Y.dev'
+      roles:
+        - php
+        - yii
+    
+    - hosts: lxc_php7_2Y
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_php7_2Y.dev'
+      roles:
+        - php
+        - yii
+    
+    - hosts: lxc_php7_4Y
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_php7_4Y.dev'
+      roles:
+        - php
+        - yii
+    
+    - hosts: lxc_php7_5Y
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_php7_5Y.dev'
+      roles:
+        - php
+        - yii
+    
+    - hosts: lxc_php7_6Y
+      vars:
+        username: 'admin'
+        password: 'admin'
+        domain: 'lxc_php7_6Y.dev'
+      roles:
+        - php
+        - yii
+    ```
+
+- Then for the last, we need to configuration the nginx settings. Go to the sites-available `cd /etc/nginx/sites-available` and create file named kelompok12.fpsas. Enter the file using `sudo nano kelompok12.fpsas` and type script as below to settings the nginx include load balancer configurations.
+
+  ```
+  upstream laravel {
+          least_conn;
+          server lxc_php7_1L.dev;
+          server lxc_php7_2L.dev;
+          server lxc_php7_4L.dev;
+          server lxc_php7_6L.dev;
+  }
+  
+  upstream wordpress {
+          ip_hash;
+          server lxc_php7_2W.dev;
+          server lxc_php7_3W.dev;
+          server lxc_php7_4W.dev;
+          server lxc_php7_5W.dev;
+  }
+  
+  upstream yii {
+          server lxc_php7_1Y.dev weight=3;
+          server lxc_php7_2Y.dev weight=2;
+          server lxc_php7_4Y.dev weight=4;
+          server lxc_php7_5Y.dev weight=1;
+          server lxc_php7_6Y.dev weight=6;
+  }
+  
+  upstream codeigniter {
+          server lxc_php5_1.dev;
+          server lxc_php5_2.dev;
+  }
+  
+  server {
+          listen 80;
+          listen [::]:80;
+  
+          server_name kelompok12.fpsas;
+  
+          root /var/www/html;
+          index index.html;
+  
+          location /product {
+                  rewrite /product/?(.*)$ /$1 break;
+                  proxy_pass http://yii;
+          }
+  
+          location /app {
+                  rewrite /app/?(.*)$ /$1 break;
+                  proxy_pass http://codeigniter;
+          }
+  
+  #       location /blog {
+  #               rewrite /?(.*)$ /$1 break;
+  #               proxy_pass http://lxc_wordpress.dev;
+  #       }
+  
+          location /phpmyadmin{
+                  rewrite /phpmyadmin/?(.*)$ /$1 break;
+                  proxy_pass http://lxc_mariadb.dev;
+          }
+  
+          location / {
+                  #rewrite /?(.*)$ /$1 break;
+                  proxy_pass http://laravel;
+          }
+  }
+  
+  server {
+          listen 80;
+          listen [::]:80;
+  
+          server_name news.kelompok12.fpsas;
+  
+          root /var/www/html;
+          index index.html;
+  
+          location / {
+                  #rewrite /?(.*)$ /$1 break;
+                  proxy_pass http://wordpress;
+          }
+  }
+  ```
+
+- Check the script and restart the nginx.
+
+  ```
+  sudo nginx -t
+  sudo nginx -s reload
+  sudo service nginx restart
+  ```
+
+- Now, we can check it our configuration in the browser by type the name of our domain (http://kelompok12.fpsas).
+
+  - laravel (kelompok12.fpsas/)
+
+    ![Tampilan Laravel](/Assets/TampilanLaravel.png)
+
+  - wordpress (news.kelompok12.fpsas)
+
+    ![Tampilan News](/Assets/TampilanNews.png)
+
+  - codeigniter (kelompok12.fpsas/app)
+
+    ![Tanpilan App](D:\Dokumentasi\Assets\TanpilanApp.png)
+
+  - yii (kelompok12.fpsas/product)
+
+    ![Tampilan Yii](/Assets/TampilanYii.png)
+
+  - phpmyadmin (kelompok12.fpsas/phpmyadmin/)
+
+    ![Tampilan PhpmyAdmin](/Assets/TampilanPhpmyAdmin.png)
+
+
 
 ## Analisa 
 
@@ -2080,9 +2415,9 @@ load balancer configuration will be use in each website
 
 ![analisis12](/Assets/analisis12.png)
 
-![ls](/Assets/ls.png)
 
-![etc](/Assets/etc.png)
+
+
 
 ##  Created By Team 12 [IT - 02 - 02]
 - Muhammad Akbar Ramadhan [1202190019]
