@@ -2337,11 +2337,6 @@ load balancer configuration will be use in each website
                   proxy_pass http://codeigniter;
           }
   
-          location /blog {
-                 rewrite /?(.*)$ /$1 break;
-                 proxy_pass http://lxc_wordpress.dev;
-          }
-  
           location /phpmyadmin{
                   rewrite /phpmyadmin/?(.*)$ /$1 break;
                   proxy_pass http://lxc_mariadb.dev;
@@ -2368,7 +2363,7 @@ load balancer configuration will be use in each website
           }
   }
   ```
-
+  
 - Check the script and restart the nginx.
 
   ```
@@ -2403,15 +2398,45 @@ load balancer configuration will be use in each website
 
 ## Analisa 
 
-- 50![B 10](/Assets/B10.png)
+- 50 user scheme
 
-  ![A 10](/Assets/A10.png)
+  - Before using load balancer
 
-- 150![B 150](/Assets/B150.png)![A 150](/Assets/A150.png)
+    ![B 10](/Assets/B10.png)
 
-- 300![B 300](/Assets/B300.png)![A 300](/Assets/A300.png)
+  - After using load balancer
 
-- 500![B 500](/Assets/B500.png)![A 500](/Assets/A500.png)
+    ![A 10](/Assets/A10.png)
+
+- 150 user scheme
+
+  - Before using load balancer
+
+    ![B 150](/Assets/B150.png)
+
+  - After using load balancer
+
+    ![A 150](/Assets/A150.png)
+
+- 300 user scheme
+
+  - Before using load balancer
+
+    ![B 300](/Assets/B300.png)
+
+  - After using load balancer
+
+    ![A 300](/Assets/A300.png)
+
+- 500 user scheme
+
+  - Before using load balancer
+
+    ![B 500](/Assets/B500.png)
+
+  - After using load balancer
+
+    ![A 500](/Assets/A500.png)
 
 Analisis 
 
