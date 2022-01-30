@@ -1,4 +1,4 @@
-# Report [Team 12] : UAS
+Report [Team 12] : UAS
 
 ## Case Study
 
@@ -2413,11 +2413,16 @@ load balancer configuration will be use in each website
 
 - 500![B 500](/Assets/B500.png)![A 500](/Assets/A500.png)
 
-![analisis12](/Assets/analisis12.png)
+Analisis 
 
+1. Table data throughput and user in the load testing before and after using load balancer.
 
+   ![analisis12](/Assets/analisis12.jpeg)
 
-
+2. reduce the throughput value and increase the value of the number of users that can be served every second for the schema that has been created
+   - reduce lxc that we use to load balancer 
+   - Downgrade OS
+   - unoptimized database 
 
 ##  Created By Team 12 [IT - 02 - 02]
 - Muhammad Akbar Ramadhan [1202190019]
